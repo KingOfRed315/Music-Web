@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - MyMusic</title>
+    <style>
+        :root { --primary: #1DB954; --bg: #0b0b0b; }
+        
+        body { 
+            background: var(--bg);
+            /* Hiệu ứng nền Gradient chuyển động nhẹ */
+            background: linear-gradient(135deg, #0b0b0b 0%, #1a1a1a 50%, #000 100%);
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+
+        /* Card đăng ký với hiệu ứng Kính mờ */
+        .auth-card { 
+            background: rgba(24, 24, 24, 0.8); 
+            padding: 50px 40px; 
+            border-radius: 15px; 
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo { color: var(--primary); font-size: 32px; font-weight: 800; margin-bottom: 20px; cursor: pointer; }
+
+        h2 { font-size: 28px; margin-bottom: 30px; letter-spacing: -1px; }
+
+        .input-group { position: relative; margin-bottom: 20px; text-align: left; }
+        
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #efefef; }
+
+        input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            border-radius: 6px; 
+            border: 1px solid #727272; 
+            background: #121212; 
+            color: white; 
+            box-sizing: border-box; 
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        input:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            background: #282828;
+            box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+        }
+
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background: var(--primary); 
+            border: none; 
+            border-radius: 30px; 
+            color: black; 
+            font-weight: 800; 
+            font-size: 16px;
+            cursor: pointer; 
+            margin-top: 15px; 
+            transition: 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover { 
+            background: #1ed760; 
+            transform: scale(1.03); 
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .divider { 
+            display: flex; align-items: center; text-align: center; 
+            margin: 30px 0; color: #727272; font-size: 12px;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #333; }
+        .divider:not(:empty)::before { margin-right: 15px; }
+        .divider:not(:empty)::after { margin-left: 15px; }
+
+        .footer-text { color: #b3b3b3; margin-top: 25px; font-size: 14px; }
+        .footer-text a { color: white; text-decoration: underline; font-weight: bold; transition: 0.2s; }
+        .footer-text a:hover { color: var(--primary); }
+
+        /* Hiệu ứng rung khi lỗi */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .error-shake { animation: shake 0.3s ease-in-out; border-color: #ff4d4d !important; }
+    </style>
+</head>
+<body>
+    <div class="auth-card" id="card">
+        <div class="logo" onclick="location.href='home.html'">MyMusic</div>
+        <h2>Bắt đầu nghe miễn phí với một tài khoản.</h2>
+        
+        <form id="signupForm">
+            <div class="input-group">
+                <label for="name">Bạn tên là gì?</label>
+                <input type="text" id="name" placeholder="Nhập tên hiển thị" required>
+            </div>
+
+            <div class="input-group">
+                <label for="email">Email của bạn là gì?</label>
+                <input type="email" id="email" placeholder="name@domain.com" required>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Tạo một mật khẩu</label>
+                <input type="password" id="password" placeholder="Tối thiểu 6 ký tự" required minlength="6">
+            </div>
+
+            <button type="submit" id="submitBtn">TIẾP TỤC</button>
+        </form>
+
+        <div class="divider">HOẶC</div>
+
+        <p class="footer-text">Bạn đã có tài khoản? <a href="signin.html">Đăng nhập ngay</a></p>
+    </div>
+
+    <script>
+        const signupForm = document.getElementById('signupForm');
+        const card = document.getElementById('card');
+
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Lấy danh sách user từ LocalStorage
+            const users = JSON.parse(localStorage.getItem('allUsers')) || [];
+
+            // Kiểm tra trùng email
+            if (users.find(u => u.email === email)) {
+                // Hiệu ứng báo lỗi sinh động
+                card.classList.add('error-shake');
+                setTimeout(() => card.classList.remove('error-shake'), 400);
+                alert("Rất tiếc, email này đã được sử dụng rồi!");
+                return;
+            }
+
+            // Tạo hiệu ứng loading giả cho "xịn"
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "ĐANG TẠO TÀI KHOẢN...";
+            btn.style.opacity = "0.7";
+            btn.disabled = true;
+
+            setTimeout(() => {
+                // Lưu user mới
+                const newUser = { name, email, password };
+                users.push(newUser);
+                localStorage.setItem('allUsers', JSON.stringify(users));
+
+                // Đăng nhập luôn
+                localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+                alert(`Chào mừng ${name} đến với thế giới âm nhạc!`);
+                window.location.href = 'home.html';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

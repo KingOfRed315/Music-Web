@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - MyMusic</title>
+    <style>
+        :root { --primary: #1DB954; --bg: #0b0b0b; --card-bg: #181818; }
+        body { background: var(--bg); color: white; margin: 0; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Navbar */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #282828; }
+        .nav-links { list-style: none; display: flex; gap: 25px; align-items: center; margin: 0; padding: 0; }
+        .nav-links a { text-decoration: none; color: #b3b3b3; font-weight: bold; transition: 0.3s; }
+        .nav-links a:hover { color: white; }
+
+        main { padding: 30px 5%; }
+
+        /* Search Box Nâng cấp */
+        .search-container { position: relative; max-width: 600px; margin-bottom: 40px; }
+        .search-input { 
+            width: 100%; padding: 18px 30px 18px 60px; border-radius: 40px; 
+            border: 2px solid transparent; font-size: 16px; outline: none; 
+            background: #242424; color: white; transition: 0.4s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .search-input:focus { background: #2a2a2a; border-color: var(--primary); box-shadow: 0 0 20px rgba(29,185,84,0.2); }
+        .search-icon { position: absolute; left: 25px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #b3b3b3; }
+
+        .section-title { margin-top: 40px; margin-bottom: 20px; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+
+        /* Grid Thể loại rực rỡ */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        .genre { 
+            height: 120px; padding: 20px; border-radius: 12px; font-weight: bold; font-size: 20px;
+            cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            position: relative; overflow: hidden;
+        }
+        .genre:hover { transform: scale(1.05) rotate(1deg); filter: brightness(1.2); }
+        .genre::after { content: ''; position: absolute; right: -20px; bottom: -20px; width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+
+        /* Artist List mượt mà */
+        .artist-list { display: flex; gap: 25px; overflow-x: auto; padding: 10px 0 20px; scrollbar-width: none; }
+        .artist-list::-webkit-scrollbar { display: none; }
+        .artist-item { text-align: center; cursor: pointer; min-width: 140px; }
+        .artist-img-wrapper { position: relative; width: 140px; height: 140px; margin-bottom: 12px; }
+        .artist-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; transition: 0.3s; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .artist-item:hover .artist-img { transform: scale(1.05); filter: grayscale(0.3); }
+        .artist-name { font-weight: bold; font-size: 15px; }
+
+        /* Result Items */
+        .result-item { 
+            display: flex; align-items: center; padding: 12px 20px; cursor: pointer; 
+            border-radius: 10px; transition: 0.2s; border: 1px solid transparent;
+        }
+        .result-item:hover { background: #282828; border-color: #333; transform: translateX(10px); }
+        .play-icon { margin-left: auto; width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; opacity: 0; transition: 0.3s; }
+        .result-item:hover .play-icon { opacity: 1; }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2 onclick="location.href='home.html'" style="cursor:pointer; color: var(--primary); margin: 0; font-size: 28px;">MyMusic</h2>
+        <ul class="nav-links">
+            <li><a href="home.html">Trang chủ</a></li>
+            <li><a href="trending.html">Thịnh hành</a></li>
+            <li><a href="search.html" style="color:white">Tìm kiếm</a></li>
+            <li id="auth-link"><a href="signup.html">Đăng ký</a></li>
+        </ul>
+    </nav>
+    <main>
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="q" class="search-input" placeholder="Bạn muốn nghe gì?">
+        </div>
+        
+        <div id="default">
+            <h2 class="section-title">Duyệt tìm tất cả</h2>
+            <div class="grid">
+                <div class="genre" style="background: linear-gradient(135deg, #E13300, #ff6437)" onclick="search('Pop')">Pop</div>
+                <div class="genre" style="background: linear-gradient(135deg, #1E3264, #7395ae)" onclick="search('V-Pop')">V-Pop</div>
+                <div class="genre" style="background: linear-gradient(135deg, #8D67AB, #c3aed6)" onclick="search('Lofi')">Lofi</div>
+                <div class="genre" style="background: linear-gradient(135deg, #E8115B, #f57eb6)" onclick="search('Indie')">Indie</div>
+            </div>
+
+            <h2 class="section-title">Nghệ sĩ đang hot</h2>
+            <div class="artist-list">
+                <div class="artist-item" onclick="search('Sơn Tùng M-TP')">
+                    <div class="artist-img-wrapper"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6t5FdJANrWj65CYTMOhwrNnb1dGz5-obsHlbbE_nJqwNwzcCGt8oF6_C4qkFItNF-1gQmbDM-JBTXw47z75CWJpyyYBf5tu77RlARKg&s=10" class="artist-img"></div>
+                    <div class="artist-name">Sơn Tùng M-TP</div>
+                </div>
+                <div class="artist-item" onclick="search('Taylor Swift')">
+                    <div class="artist-img-wrapper"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/960px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png" class="artist-img"></div>
+                    <div class="artist-name">Taylor Swift</div>
+                </div>
+                <div class="artist-item" onclick="search('HIEUTHUHAI')">
+                    <div class="artist-img-wrapper"><img src="https://liembarbershop.com/wp-content/uploads/2024/07/hieuthuhai-1.jpg" class="artist-img"></div>
+                    <div class="artist-name">HIEUTHUHAI</div>
+                </div>
+                <div class="artist-item" onclick="search('Đen Vâu')">
+                    <div class="artist-img-wrapper"><img src="https://vcdn1-vnexpress.vnecdn.net/2022/02/09/denvau-5827-1627546466-5337-1644377203.jpg?w=680&h=0&q=100&dpr=2&fit=crop&s=rpm2cgIdVzle7xKvlbBCaA" class="artist-img"></div>
+                    <div class="artist-name">Đen Vâu</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" style="margin-top:20px"></div>
+    </main>
+
+    <script>
+        const q = document.getElementById('q');
+        let t;
+        q.oninput = () => { 
+            clearTimeout(t); 
+            if(q.value.trim() === "") {
+                document.getElementById('default').style.display = 'block';
+                document.getElementById('results').innerHTML = '';
+            } else {
+                t = setTimeout(() => search(q.value), 500); 
+            }
+        };
+
+        async function search(val) {
+            if(!val) return;
+            q.value = val;
+            document.getElementById('default').style.display = 'none';
+            document.getElementById('results').innerHTML = '<div style="text-align:center; padding:50px;"><div class="loader"></div><p style="color:gray">Đang tìm giai điệu...</p></div>';
+
+            try {
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(val)}&limit=15&entity=song&country=vn`);
+                const data = await res.json();
+                localStorage.setItem('currentPlaylist', JSON.stringify(data.results));
+                
+                if(data.results.length === 0) {
+                    document.getElementById('results').innerHTML = '<p style="text-align:center; color:gray; padding:50px;">Rất tiếc, không thấy bài hát bạn tìm :(</p>';
+                    return;
+                }
+
+                document.getElementById('results').innerHTML = `
+                    <h2 class="section-title">Kết quả cho "${val}"</h2>
+                    ${data.results.map((s, i) => `
+                        <div class="result-item" onclick="location.href='player.html?index=${i}'">
+                            <img src="${s.artworkUrl100}" style="width:55px; height:55px; border-radius:6px; margin-right:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3)">
+                            <div>
+                                <div style="font-weight:bold; font-size:16px;">${s.trackName}</div>
+                                <div style="color:#b3b3b3; font-size:13px">${s.artistName}</div>
+                            </div>
+                            <div class="play-icon">▶</div>
+                        </div>
+                    `).join('')}
+                `;
+            } catch(e) { 
+                document.getElementById('results').innerHTML = "Lỗi kết nối. Vui lòng kiểm tra internet."; 
+            }
+        }
+
+        // Navbar Logic
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if(user) {
+            document.getElementById('auth-link').innerHTML = `<div onclick="logout()" style="cursor:pointer; background:#282828; padding:8px 20px; border-radius:25px; font-size:14px; color:var(--primary); font-weight:bold; border: 1px solid #444;">Đăng xuất</div>`;
+        }
+        function logout() {
+            if(confirm("Bạn muốn đăng xuất?")) { localStorage.removeItem('currentUser'); location.reload(); }
+        }
+    </script>
+</body>
+</html>

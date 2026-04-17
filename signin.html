@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - MyMusic</title>
+    <style>
+        :root { --primary: #1DB954; --bg: #0b0b0b; }
+        
+        body { 
+            background: var(--bg); 
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Hiệu ứng đốm sáng mờ ảo ở nền */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: var(--primary);
+            filter: blur(120px);
+            opacity: 0.15;
+            z-index: -1;
+            animation: move 10s infinite alternate;
+        }
+        body::before { top: -50px; left: -50px; }
+        body::after { bottom: -50px; right: -50px; animation-delay: 5s; }
+
+        @keyframes move {
+            from { transform: translate(0, 0); }
+            to { transform: translate(100px, 50px); }
+        }
+
+        .auth-card { 
+            background: rgba(24, 24, 24, 0.9); 
+            padding: 50px 40px; 
+            border-radius: 20px; 
+            width: 100%; 
+            max-width: 400px; 
+            text-align: center; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(15px); /* Hiệu ứng kính mờ */
+            animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .logo-text { 
+            font-size: 35px; 
+            font-weight: 900; 
+            color: var(--primary); 
+            margin-bottom: 5px; 
+            letter-spacing: -1.5px;
+            cursor: pointer;
+        }
+
+        .subtitle { color: #b3b3b3; margin-bottom: 35px; font-size: 15px; }
+
+        /* Input Group cải tiến */
+        .input-group { position: relative; margin-bottom: 25px; text-align: left; }
+        
+        .input-group input { 
+            width: 100%; 
+            padding: 16px 15px; 
+            border-radius: 8px; 
+            border: 1px solid #404040; 
+            background: rgba(0,0,0,0.3); 
+            color: white; 
+            box-sizing: border-box; 
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        /* Floating Label Effect */
+        .input-group label {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #727272;
+            pointer-events: none;
+            transition: 0.3s;
+            font-size: 15px;
+        }
+
+        /* Khi input được focus hoặc có giá trị */
+        .input-group input:focus ~ label,
+        .input-group input:not(:placeholder-shown) ~ label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: var(--primary);
+            background: #181818;
+            padding: 0 5px;
+            font-weight: bold;
+        }
+
+        .input-group input:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            box-shadow: 0 0 15px rgba(29, 185, 84, 0.15);
+        }
+
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background: var(--primary); 
+            border: none; 
+            border-radius: 40px; 
+            color: black; /* Chữ đen trên nền xanh lá theo style Spotify */
+            font-weight: 800; 
+            cursor: pointer; 
+            margin-top: 15px; 
+            font-size: 15px;
+            letter-spacing: 1.5px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        button:hover { 
+            background: #1ed760; 
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(29, 185, 84, 0.3);
+        }
+
+        .error-msg { 
+            background: rgba(233, 30, 99, 0.1);
+            color: #ff5252; 
+            font-size: 13px; 
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px; 
+            display: none;
+            border-left: 4px solid #ff5252;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .footer { margin-top: 40px; border-top: 1px solid #333; padding-top: 25px; }
+        .footer p { font-size: 14px; color: #b3b3b3; }
+        .footer a { color: white; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .footer a:hover { color: var(--primary); }
+
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <div class="logo-text" onclick="location.href='home.html'">MyMusic</div>
+        <div class="subtitle">Nghe nhạc không giới hạn.</div>
+
+        <div id="error-message" class="error-msg">⚠️ Thông tin đăng nhập không chính xác.</div>
+        
+        <form id="signinForm">
+            <div class="input-group">
+                <input type="email" id="email" placeholder=" " required>
+                <label>Địa chỉ Email</label>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" placeholder=" " required>
+                <label>Mật khẩu</label>
+            </div>
+
+            <button type="submit" id="btnText">ĐĂNG NHẬP</button>
+        </form>
+
+        <div class="footer">
+            <p>Bạn mới biết đến MyMusic? <a href="signup.html">Đăng ký tài khoản</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signinForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('error-message');
+            const btn = document.getElementById('btnText');
+
+            const users = JSON.parse(localStorage.getItem('allUsers')) || [];
+            const userMatch = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+
+            if (userMatch) {
+                localStorage.setItem('currentUser', JSON.stringify(userMatch));
+                
+                // Hiệu ứng loading mượt
+                btn.innerText = "ĐANG VÀO...";
+                btn.style.width = "100%";
+                
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 800);
+            } else {
+                errorDiv.style.display = 'block';
+                // Rung cả form để báo lỗi
+                document.querySelector('.auth-card').animate([
+                    { transform: 'translateX(0)' },
+                    { transform: 'translateX(-5px)' },
+                    { transform: 'translateX(5px)' },
+                    { transform: 'translateX(0)' }
+                ], { duration: 300 });
+
+                setTimeout(() => { errorDiv.style.display = 'none'; }, 4000);
+            }
+        });
+    </script>
+</body>
+</html>
